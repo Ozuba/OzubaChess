@@ -227,50 +227,54 @@ void ChessBoard::clickHandler()
     tileSelect = tileAt(mx, my);
     Piece *selectedPiece = pieceAt(tileSelect);
     // Por ahora implementaremos sin tiempo si se suelta el raton en la pieza donde se pulso queda seleccionada la pieza
-    if (selectedPiece != nullptr) // Si no hemos cogido ninguna pieza
-    {                             // Si hay pieza
-        bool held = true;
+    if (selectedPiece != nullptr) // Si hemos cogido una Pieza
+    {
 
-        while (held != false)
-        {
+        if (selectedPiece->color == state)
+        { // Si hay pieza(Ojo Implementacion pocha facilona, el orden de los enum coincide)
+            bool held = true;
 
-            SDL_PollEvent(&event);
-
-            if (event.type == SDL_MOUSEMOTION) // Si se mueve actualiza la pantalla
+            while (held != false)
             {
-                SDL_GetMouseState(&mx, &my);
-                selectedPiece->x = mx - (width / CHESSWIDTH) / 2; // El offset para agarrar por el centro
-                selectedPiece->y = my - (height / CHESSHEIGHT) / 2;
-                render(); // Sigue renderizando
-            }
 
-            if (event.type == SDL_MOUSEBUTTONUP) // Si la suelta inicia el proceso de validación de posicion y movimiento
-            {
-                held = false;
-                SDL_GetMouseState(&mx, &my); // Acutaliza el raton
-                destPos = tileAt(mx, my);    // Ficha destino
-                if (isValidMove(selectedPiece, destPos))
+                SDL_PollEvent(&event);
+
+                if (event.type == SDL_MOUSEMOTION) // Si se mueve actualiza la pantalla
                 {
-                    if (pieceAt(destPos) == nullptr) // Si la casilla destino está libre y el movimento es valido
-                    {
-                        move(selectedPiece, destPos); // Mueve la pieza
-                    }
-                    else if (selectedPiece->color == pieceAt(destPos)->color) // Si hay una pieza  de su color devolverla a su sitio
-                    {
-                        // IMPLEMENTAR ENROQUE AQUI ES LA UNICA CONDICION QUE HACE ALGO AL SOLTAR UNA FICHA SOBRE OTRA
-                        setPiecesPos(); // Reinicia las posiciones
-                    }
-
-                    else if (pieceAt(destPos)->color != selectedPiece->color)
-                    {                                 // Si hay una pieza de otro color y el movimiento es valido matarla y tomar su posición
-                        killPiece(pieceAt(destPos));  // elimina
-                        move(selectedPiece, destPos); // Mueve la pieza
-                    }
+                    SDL_GetMouseState(&mx, &my);
+                    selectedPiece->x = mx - (width / CHESSWIDTH) / 2; // El offset para agarrar por el centro
+                    selectedPiece->y = my - (height / CHESSHEIGHT) / 2;
+                    render(); // Sigue renderizando
                 }
-                else
-                {
 
-                    setPiecesPos(); // El movimiento no ha sido valido vuelve a su sitio
+                if (event.type == SDL_MOUSEBUTTONUP) // Si la suelta inicia el proceso de validación de posicion y movimiento
+                {
+                    held = false;
+                    SDL_GetMouseState(&mx, &my); // Acutaliza el raton
+                    destPos = tileAt(mx, my);    // Ficha destino
+                    if (isValidMove(selectedPiece, destPos))
+                    {
+                        if (pieceAt(destPos) == nullptr) // Si la casilla destino está libre y el movimento es valido
+                        {
+                            move(selectedPiece, destPos); // Mueve la pieza
+                        }
+                        else if (selectedPiece->color == pieceAt(destPos)->color) // Si hay una pieza  de su color devolverla a su sitio
+                        {
+                            // IMPLEMENTAR ENROQUE AQUI ES LA UNICA CONDICION QUE HACE ALGO AL SOLTAR UNA FICHA SOBRE OTRA
+                            setPiecesPos(); // Reinicia las posiciones
+                        }
+
+                        else if (pieceAt(destPos)->color != selectedPiece->color)
+                        {                                 // Si hay una pieza de otro color y el movimiento es valido matarla y tomar su posición
+                            killPiece(pieceAt(destPos));  // elimina
+                            move(selectedPiece, destPos); // Mueve la pieza
+                        }
+                    }
+                    else
+                    {
+
+                        setPiecesPos(); // El movimiento no ha sido valido vuelve a su sitio
+                    }
                 }
             }
         }
@@ -302,7 +306,8 @@ void ChessBoard::newGame() // Positions pieces like classic game
     {
         pieceSet[i] = new Piece(BLACK, PAWN, i - 24, 6);
     }
-    setPiecesPos(); // Actualiza las Piezas
+    setPiecesPos();     // Actualiza las Piezas
+    state = WHITEPLAYS; // Juegan Blancas
 }
 
 void ChessBoard::move(Piece *piece, Pos_t pos)
@@ -311,6 +316,7 @@ void ChessBoard::move(Piece *piece, Pos_t pos)
     piece->b = pos.b;
     piece->neverMoved = false;
     setPiecesPos(); // Actualizamos tablero
+    nextTurn();     // Cambiamos al siguiente Jugador
 }
 
 void ChessBoard::killPiece(Piece *p)
@@ -346,32 +352,51 @@ bool ChessBoard::isValidMove(Piece *piece, Pos_t dest)
 
     if (isValidPieceMove(piece, dest)) // Mira si el movimiento es legal para la pieza
     {
-        //Comprobamos el camino si hay obstaculos excepto en la casilla destino
-        Pos_t check;
-        if (piece->figure != KNIGHT)// Excluir al caballo de este check ya que salta piezas y ademas no linealmente
-        {
+        // Comprobamos el camino si hay obstaculos excepto en la casilla destino
 
-            for (int x = piece->a; abs(x - dest.a) != 0; (dest.a > piece->a ? x++ : x--)) //Algoritmo de busqueda (CAMBIAR)
+        if (piece->figure != KNIGHT) // Excluir al caballo de este check ya que salta piezas y ademas no linealmente
+        {
+            Pos_t mov; // utilizado como vector direccional aqui dest-origen
+            mov.a = dest.a - piece->a;
+            mov.b = dest.b - piece->b;
+
+            Pos_t relPos; // Posicion relativa
+
+            for (int i = 0; i < PIECESETSIZE; i++)
             {
-                for (int y = piece->b; abs(y - dest.b) != 0; (dest.b > piece->b ? y++ : y--))
-                {
-                    check.a = x;
-                    check.b = y;
-                    if (pieceAt(check) != nullptr)
-                    {
-                        return false;
+                if (pieceSet[i] != nullptr)
+                { // Algoritmo 1: Comprueba si el producto escalar entre el vector desplazamiento y el vector posicion de la ficha respecto de la posicion origen es nulo usando un threshold OJO EVITAR QUE SEA NEGATIVO
+                    // Sacamos posición relativa
+                    relPos.a = pieceSet[i]->a - piece->a;
+                    relPos.b = pieceSet[i]->b - piece->b;
+                    // Calculamos modulos
+                    float modRel = sqrt(relPos.a * relPos.a + relPos.b * relPos.b);
+                    float modMov = sqrt(mov.a * mov.a + mov.b * mov.b);
+                    if (modRel < modMov)
+                    { // Ademas el modulo del movimiento ha de ser estrictamente menor al vector posición relativa pq la ficha ha de estar antes del destino
+
+                        double prod = (float)(relPos.a * mov.a + relPos.b * mov.b);
+                        double cos = prod / (modMov * modRel);
+                        if (abs(prod / (modMov * modRel) - 1) <= FLOATCMPTHRESHOLD && prod > 0) // positivo para que la direccion sea la de menor angulo (Comprueba si la ficha en el rango de accion se encuentra en nuestra direccion) además evita que su propia posicion sea un movimiento valido producto por nulo es nulo
+                        {
+                            return false;
+                        }
                     }
                 }
             }
-            return true;//Si sobrevive al check el movimiento se cataloga como valido
-        }else if(piece->figure == KNIGHT){
-            return true;//El caballo no chequea y hay que darle paso
+
+            return true; // Si sobrevive al check el movimiento se cataloga como valido
         }
-    }else{
+        else if (piece->figure == KNIGHT)
+        {
+            return true; // El caballo no chequea y hay que darle paso
+        }
+    }
+    else // Exit de movimiento no valido para pieza
+    {
         return false;
     }
-    return false;//Por diseño(No deberia ejecutarse nunca)VENIR A BUSCAR ERRORES AQUI 
-
+    return false; // Por diseño(No deberia ejecutarse nunca)VENIR A BUSCAR ERRORES AQUI(Piezas corruptas, existentes sin tipo)
 }
 
 bool ChessBoard::isValidPieceMove(Piece *piece, Pos_t dest) // Incluye las reglas de movimiento de todas las piezas, no controla colisiones
@@ -383,18 +408,27 @@ bool ChessBoard::isValidPieceMove(Piece *piece, Pos_t dest) // Incluye las regla
         {
         case WHITE:
             // Ojo comida diagonal, permitir movimiento diagonal y negar al no encontrar pieza mas tarde
-            if (dest.a == piece->a && (dest.b - piece->b == 1 || (dest.b - piece->b == 2 && piece->neverMoved)))
+            if ((dest.a == piece->a && (dest.b - piece->b == 1 || (dest.b - piece->b == 2 && piece->neverMoved))) && pieceAt(dest) == nullptr)
             {
+                return true;
+            }
+            if (abs(dest.a - piece->a) == 1 && (dest.b - piece->b == 1) && pieceAt(dest) != nullptr)
+            { // Comida diagonal
                 return true;
             }
             break;
 
         case BLACK:
             // Ojo comida diagonal, permitir movimiento diagonal y negar al no encontrar pieza mas tarde
-            if (dest.a == piece->a && (dest.b - piece->b == -1 || (dest.b - piece->b == -2 && piece->neverMoved)))
+            if ((dest.a == piece->a && (dest.b - piece->b == -1 || (dest.b - piece->b == -2 && piece->neverMoved))) && pieceAt(dest) == nullptr) // Movimiento Normal
             {
                 return true;
             }
+            if (abs(dest.a - piece->a) == 1 && (dest.b - piece->b == -1) && pieceAt(dest) != nullptr)
+            { // Comida diagonal
+                return true;
+            }
+
             break;
         }
         break;
@@ -442,4 +476,18 @@ bool ChessBoard::isValidPieceMove(Piece *piece, Pos_t dest) // Incluye las regla
         break;
     }
     return false;
+}
+
+void ChessBoard::nextTurn()
+{
+    switch (state)
+    {
+    case WHITEPLAYS:
+        state = BLACKPLAYS;
+        break;
+
+    case BLACKPLAYS:
+        state = WHITEPLAYS;
+        break;
+    }
 }

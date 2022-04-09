@@ -16,6 +16,11 @@ SDL chess interface
 #define PIECESIZE 45 // Tamaño de la Pieza de asset
 #define PIECESETSIZE 32
 
+
+
+
+#define FLOATCMPTHRESHOLD 0.00005 //Para comprobar la igualdad de dos operaciones en coma flotante porbado con el caso limite ficha en cada esquina //es posible que haya que aumentarlo si se hace el tablero mas grande
+
 // El objetivo es poder crearlo como una libreria en la que
 // se creará un objeto chessboard con el que interactuar a traves de sus metodos publicos
 // devolverá los datos al motor a traves de una pool de datos a la que se podrá acceder de manera publica
@@ -98,6 +103,10 @@ private:
    // Funciones de utilidad de ventana
 
    Pos_t tileAt(int x, int y);
+
+
+   //Cambiador de estado
+   void nextTurn();
 
    // Eventos de la ventana chessboard
    SDL_Event event;
