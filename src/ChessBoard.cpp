@@ -345,9 +345,7 @@ bool ChessBoard::isValidMove(Piece *piece, Pos_t dest)
 
     // sacar direccion comprobar que es aplicable a la figura y buscar colisiones con otra figura
     // descartado ->
-    // Funcion moveMap(Piece* p)
     // Toma una pieza y conociendo su posicion a,b  genera un mapa binario de trayectoria uint64_t(ojo deja de valer para tableros de dim arbitrarias)
-    // Funcion posMap() -> devuelve un mapa con las posiciones
     // Interseccionando ambos
 
     if (isValidPieceMove(piece, dest)) // Mira si el movimiento es legal para la pieza
@@ -384,19 +382,44 @@ bool ChessBoard::isValidMove(Piece *piece, Pos_t dest)
                     }
                 }
             }
-
-            return true; // Si sobrevive al check el movimiento se cataloga como valido
         }
-        else if (piece->figure == KNIGHT)
+// FIN CHECKS  SI LLEGA HASTA AQUI O ES CABALLO O EL MOVIMIENTO ES VALIDO
+#ifdef KINGCHECKMATE
+        if (!kingCheck) // Evita la recursion infinita
         {
-            return true; // El caballo no chequea y hay que darle paso
+            // Movemos provisionalmente la pieza
+            int backa = piece->a; // backup de posicion
+            int backb = piece->b;
+            piece->a = dest.a;
+            piece->b = dest.b;
+            if (!isKingBeingExposed(piece, dest))
+            {
+                // Restauramos(Se va a volver a cambiar pero da igual por seguridad)
+                piece->a = backa;
+                piece->b = backb;
+                return true; // Unica salida
+            }
+            else
+            {// El rey ha sido expuesto
+                piece->a = backa;
+                piece->b = backb;
+                return false; 
+            }
+        }else{
+
+        return true; //No hay kingcheck y el movimiento es valido
+
         }
+        
+#else
+        return true;
+#endif
     }
-    else // Exit de movimiento no valido para pieza
+    else
     {
-        return false;
+
+        return false; // ha sobrevivido a checks
     }
-    return false; // Por diseño(No deberia ejecutarse nunca)VENIR A BUSCAR ERRORES AQUI(Piezas corruptas, existentes sin tipo)
 }
 
 bool ChessBoard::isValidPieceMove(Piece *piece, Pos_t dest) // Incluye las reglas de movimiento de todas las piezas, no controla colisiones
@@ -476,6 +499,52 @@ bool ChessBoard::isValidPieceMove(Piece *piece, Pos_t dest) // Incluye las regla
         break;
     }
     return false;
+}
+
+bool ChessBoard::isKingBeingExposed(Piece *piece, Pos_t dest)
+{
+    kingCheck = true;
+    // Mirara si alguna de las piezas enemigas tiene acceso a nuestro rey
+    Pos_t kingPos = lookFor(piece->color == WHITE ? WHITE : BLACK, KING);
+
+    for (int i = 0; i < PIECESETSIZE; i++)
+    {
+        if (pieceSet[i] != nullptr)
+        { // Si la pieza existe
+            if (pieceSet[i]->color != piece->color && piece->figure != KING)
+            { // Si es del otro equipo
+
+                if (isValidMove(pieceSet[i], kingPos)) // Ojo la kingpos no esta bien y corregirla por el debugger tampoco ko arregla
+                {                                      // Ver si tiene acceso al rey
+                    kingCheck = false;                 // No se si deberia existir pero chequearia hasta el infinito corta la recursion
+                    return true;                       // Esta expMigueluesto
+                }
+            }
+        }
+    }
+    kingCheck = false;
+    return false;
+}
+
+Pos_t ChessBoard::lookFor(Player_t color, Figure_t figure)
+{
+    Pos_t pos;
+    for (int i = 0; i < PIECESETSIZE; i++)
+    {
+        if (pieceSet[i] != nullptr)
+        {
+            if (pieceSet[i]->color == color && pieceSet[i]->figure == figure)
+            {
+                pos.a = pieceSet[i]->a;
+                pos.b = pieceSet[i]->b;
+
+                return pos;
+            }
+        }
+    }
+    pos.a = -1; // No se ha encontrado
+    pos.b = -1;
+    return pos;
 }
 
 void ChessBoard::nextTurn()

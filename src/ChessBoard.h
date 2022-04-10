@@ -15,7 +15,7 @@ SDL chess interface
 #define CHESSWIDTH 8
 #define PIECESIZE 45 // Tamaño de la Pieza de asset
 #define PIECESETSIZE 32
-
+#define KINGCHECKMATE
 
 
 
@@ -82,6 +82,7 @@ private:
    // Estado del Juego Juegan blancas/negras, esperando al motor, validando movimiento, idle...
    State_t state;
 
+
    // Array de Piezas
    Piece *pieceSet[PIECESETSIZE];
    void killPiece(Piece* p);//Elimina la pieza del array y la destruye
@@ -89,6 +90,9 @@ private:
    Piece *pieceAt(Pos_t pos);//devuelve la pieza en la posicíon
    Pos_t tileSelect ={-1,-1} ;//Casilla seleccionada
    bool isValidPieceMove(Piece* piece, Pos_t dest);
+   Pos_t lookFor(Player_t color, Figure_t figure);
+   bool isKingBeingExposed(Piece* piece, Pos_t dest);//Función
+   bool kingCheck = false;
 
    //  Spritesheet Piezas
    SDL_Texture *spriteSheet;
