@@ -20,6 +20,7 @@ it currently supports the basic part of the Chess Ruleset:
 Run:
 ```bash
 make all
+./chess
 ```
 This will compile the example file.
 
