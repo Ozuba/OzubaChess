@@ -388,29 +388,45 @@ bool ChessBoard::isValidMove(Piece *piece, Pos_t dest)
         if (!kingCheck) // Evita la recursion infinita
         {
             // Movemos provisionalmente la pieza
-            int backa = piece->a; // backup de posicion
-            int backb = piece->b;
+            Pos_t back;
+            Figure_t backPiece;
+            if (pieceAt(dest) != nullptr)
+            { // if there is a piece to be killed at destination disable it changing type to none
+                backPiece = pieceAt(dest)->figure;
+                pieceAt(dest)->figure = NONE; // Deshabilita la pieza
+            }
+            //Despues de deshabilitar
             piece->a = dest.a;
             piece->b = dest.b;
+
             if (!isKingBeingExposed(piece, dest))
             {
                 // Restauramos(Se va a volver a cambiar pero da igual por seguridad)
-                piece->a = backa;
-                piece->b = backb;
+                piece->a = back.a;
+                piece->b = back.b;
+                if (pieceAt(dest) != nullptr)
+                {
+                    pieceAt(dest)->figure = backPiece; // Rehabilita la Pieza
+                }
                 return true; // Unica salida
             }
             else
-            {// El rey ha sido expuesto
-                piece->a = backa;
-                piece->b = backb;
-                return false; 
+            { // El rey ha sido expuesto
+                piece->a = back.a;
+                piece->b = back.b;
+                if (pieceAt(dest) != nullptr)
+                {
+                    pieceAt(dest)->figure = backPiece; // Rehabilita la Pieza
+                }
+                return false;
             }
-        }else{
-
-        return true; //No hay kingcheck y el movimiento es valido
-
         }
-        
+        else
+        {
+
+            return true; // No hay kingcheck y el movimiento es valido
+        }
+
 #else
         return true;
 #endif
@@ -492,7 +508,10 @@ bool ChessBoard::isValidPieceMove(Piece *piece, Pos_t dest) // Incluye las regla
 
         break;
 
+    case NONE:
+        return false; // Todas las Piezas de tipo nulo no pueden moverse de ninguna manera y por tanto no molestan a las funciones de check
         break;
+
         // Rey y reina
 
     default:
