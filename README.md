@@ -15,6 +15,17 @@ it currently supports the basic part of the Chess Ruleset:
  - [ ] Click Based piece movement
  - [ ] Hints of available moves on the board;
 
+## To Test ##
+Run:
+```bash
+make all
+```
+This will compile the example file.
+
+fads
+
+ # Sources #
+ Icons: https://commons.wikimedia.org/wiki/File:Chess_Pieces_Sprite.svg
  
 
 
