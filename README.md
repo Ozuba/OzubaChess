@@ -17,7 +17,14 @@ it currently supports the basic part of the Chess Ruleset:
  - [ ] Add sounds
 
 ## To Test ##
+
+Installed required libs with your prefered package manager:
+## For Debian Based Systems: ##
+```bash
+sudo apt-get install libsdl2-dev libsdl2-image-1.2
+```
 Run:
+
 ```bash
 make all
 ./chess
