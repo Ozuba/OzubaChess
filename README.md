@@ -17,6 +17,8 @@ it currently supports the basic part of the Chess Ruleset:
  - [ ] Click Based piece movement
  - [ ] Hints of available moves on the board;
  - [ ] Add sounds
+ - [ ] En Passant
+ - [ ] Castling
 
 ## To Test ##
 
