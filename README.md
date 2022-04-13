@@ -1,4 +1,6 @@
 # OzubaChess
+![Screenshot](https://github.com/Ozuba/OzubaChess/blob/master/Screnshot.png)
+
 Ozuba Chess is a simple Chess Gui written in c++ using the SDL2 Graphics library,
 it currently supports the basic part of the Chess Ruleset:
 
@@ -15,6 +17,8 @@ it currently supports the basic part of the Chess Ruleset:
  - [ ] Click Based piece movement
  - [ ] Hints of available moves on the board;
  - [ ] Add sounds
+ - [ ] En Passant
+ - [ ] Castling
 
 ## To Test ##
 
