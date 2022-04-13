@@ -389,6 +389,8 @@ bool ChessBoard::isValidMove(Piece *piece, Pos_t dest)
         {
             // Movemos provisionalmente la pieza
             Pos_t back;
+            Piece *disabled = pieceAt(dest);
+            disablePiece(pieceAt(dest));//Si la hay sino no hace na
             piece->a = dest.a;
             piece->b = dest.b;
             if (!isKingBeingExposed(piece, dest))
@@ -396,20 +398,24 @@ bool ChessBoard::isValidMove(Piece *piece, Pos_t dest)
                 // Restauramos(Se va a volver a cambiar pero da igual por seguridad)
                 piece->a = back.a;
                 piece->b = back.b;
-                return true; // Unica salida
+                enablePiece(disabled); // Restaura la pieza
+                return true;           // Unica salida
             }
             else
-            {// El rey ha sido expuesto
+            { // El rey ha sido expuesto
                 piece->a = back.a;
                 piece->b = back.b;
-                return false; 
+                enablePiece(disabled); // Restaura la pieza
+
+                return false;
             }
-        }else{
-
-        return true; //No hay kingcheck y el movimiento es valido
-
         }
-        
+        else
+        {
+
+            return true; // No hay kingcheck y el movimiento es valido
+        }
+
 #else
         return true;
 #endif
@@ -558,4 +564,31 @@ void ChessBoard::nextTurn()
         state = WHITEPLAYS;
         break;
     }
+}
+
+void ChessBoard::disablePiece(Piece *piece)
+{
+
+    for (int i = 0; i < PIECESETSIZE; i++)
+    {
+        if (pieceSet[i] != nullptr && pieceSet[i] == piece)
+        {
+            pieceSet[i] = nullptr; // La elimina de el slot
+            return;                // exit
+        }
+       
+    }
+}
+
+void ChessBoard::enablePiece(Piece *piece)
+{
+    for (int i = 0; i < PIECESETSIZE; i++)
+    {
+        if (pieceSet[i] == nullptr)
+        {
+            pieceSet[i] = piece; // La introduce en el primer slot libre
+            return;              // exit
+        }
+    }
+    cout << "No space in pieceSet available";
 }

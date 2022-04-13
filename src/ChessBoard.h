@@ -92,7 +92,11 @@ private:
    bool isValidPieceMove(Piece* piece, Pos_t dest);
    Pos_t lookFor(Player_t color, Figure_t figure);
    bool isKingBeingExposed(Piece* piece, Pos_t dest);//Función
+
+   void disablePiece(Piece* piece);//Deshabilita una Pieza en el tablero para hacer checks
+   void enablePiece(Piece * piece);
    bool kingCheck = false;
+
 
    //  Spritesheet Piezas
    SDL_Texture *spriteSheet;
