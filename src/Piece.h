@@ -10,6 +10,9 @@
 #define ICON_H 45
 #define ICON_W 45
 
+#define PIECESETSIZE 32//Determina cuantas piezas hay en un set
+
+
 typedef enum
 {
     WHITE,

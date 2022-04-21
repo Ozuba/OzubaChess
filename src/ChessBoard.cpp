@@ -17,7 +17,15 @@ ChessBoard::ChessBoard(size_t h, size_t w)
 
 ChessBoard::~ChessBoard()
 {
-    delete[] * pieceSet; // eliminamos las piezas
+
+    for (int i = 0; i < PIECESETSIZE; i++) // eliminamos las piezas
+    {
+        if (pieceSet[i] != nullptr)
+        {
+
+            delete pieceSet[i];
+        }
+    }
     SDL_DestroyWindow(window);
     IMG_Quit();
     SDL_Quit();
@@ -390,8 +398,10 @@ bool ChessBoard::isValidMove(Piece *piece, Pos_t dest)
             // Movemos provisionalmente la pieza
             Pos_t back;
             Piece *disabled = pieceAt(dest);
-            disablePiece(pieceAt(dest));//Si la hay sino no hace na
-            piece->a = dest.a;
+            disablePiece(pieceAt(dest)); // Si la hay sino no hace na
+            back.a = piece->a;           // Hacemos backup de la posicion
+            back.b = piece->b;
+            piece->a = dest.a; // Movemos la pieza a la posicion destino
             piece->b = dest.b;
             if (!isKingBeingExposed(piece, dest))
             {
@@ -576,7 +586,6 @@ void ChessBoard::disablePiece(Piece *piece)
             pieceSet[i] = nullptr; // La elimina de el slot
             return;                // exit
         }
-       
     }
 }
 
@@ -590,5 +599,74 @@ void ChessBoard::enablePiece(Piece *piece)
             return;              // exit
         }
     }
-    cout << "No space in pieceSet available";
+}
+
+//////////////////////////////////////////////////////[FEN(Forthsy edwards Notation)]/////////////////////////////////////////////////////////////////////////////
+
+string ChessBoard::getFen()
+{
+    string fen;
+    int emptycnt = 0; // Contador de espacios vacios
+    Pos_t pos;
+    pos.a = 0;
+    pos.b = CHESSHEIGHT - 1; // Estado inicial
+    Piece *piece;
+
+    for (; pos.b >= 0; pos.b--) // filas
+    {
+        for (; pos.a < CHESSWIDTH; pos.a++)
+        {
+            piece = pieceAt(pos); // Preguardamos la pieza
+
+            if (piece == nullptr)
+            {
+                emptycnt++; // Si la posicion esta vacia sumamos al counter
+            }
+            else
+            {
+                if (emptycnt != 0)
+                { // Contador distinto de 0
+                    fen.append(to_string(emptycnt));
+                    emptycnt = 0; // resetea
+                }
+
+                // Implementar chequeo de color mayus vs minus
+                switch (piece->figure)
+                {
+                case KING:
+                    fen.append(piece->color ? "K" : "k");
+                    break;
+                case QUEEN:
+                    fen.append(piece->color ? "Q" : "q");
+                    break;
+                case BISHOP:
+                    fen.append(piece->color ? "B" : "b");
+                    break;
+                case KNIGHT:
+                    fen.append(piece->color ? "N" : "n");
+                    break;
+                case ROOK:
+                    fen.append(piece->color ? "R" : "r");
+
+                    break;
+                case PAWN:
+                    fen.append(piece->color ? "P" : "p");
+
+                    break;
+                default:
+                    cout << "Non standar piece";
+                    break;
+                }
+            }
+        }
+        pos.a = 0; // recordemos que el bucle ya no se encarga de esto
+        if (emptycnt != 0)//Tambien se comprueba aqui por si no hay fichas
+        { // Contador distinto de 0
+            fen.append(to_string(emptycnt));
+            emptycnt = 0; // resetea
+        }
+        fen.append("/"); // Separador
+    }
+
+    return fen;
 }

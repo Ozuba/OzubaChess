@@ -7,6 +7,7 @@ ChessBoard board1(400,400);
 
 board1.loadSpritesheet("assest/Pieces.png");
 board1.newGame();
+cout << board1.getFen();
 while(board1.loop());
 
 }

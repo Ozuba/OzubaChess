@@ -13,13 +13,10 @@ SDL chess interface
 
 #define CHESSHEIGHT 8
 #define CHESSWIDTH 8
-#define PIECESIZE 45 // Tamaño de la Pieza de asset
-#define PIECESETSIZE 32
+#define PIECESIZE 45 // Tamaño de la Pieza de asset(OJO redundante)
 #define KINGCHECKMATE
 
-
-
-#define FLOATCMPTHRESHOLD 0.00005 //Para comprobar la igualdad de dos operaciones en coma flotante porbado con el caso limite ficha en cada esquina //es posible que haya que aumentarlo si se hace el tablero mas grande
+#define FLOATCMPTHRESHOLD 0.00005 // Para comprobar la igualdad de dos operaciones en coma flotante porbado con el caso limite ficha en cada esquina //es posible que haya que aumentarlo si se hace el tablero mas grande
 
 // El objetivo es poder crearlo como una libreria en la que
 // se creará un objeto chessboard con el que interactuar a traves de sus metodos publicos
@@ -68,9 +65,9 @@ public:
    void getMove();
    void newGame();                                      // Genera un Juego de ajedrez clasico
    void move(int srca, int srcb, int desta, int destb); // Mueve una Pieza de una Posición a otra
-   void move(Piece* piece, Pos_t pos); // Sobrecarga para mover piezas por puntero
+   void move(Piece *piece, Pos_t pos);                  // Sobrecarga para mover piezas por puntero
 
-   bool isValidMove(Piece* piece, Pos_t pos);//Valida el movimiento
+   bool isValidMove(Piece *piece, Pos_t pos); // Valida el movimiento
 
    // Publicas por ahora
    void render(); // Renderiza piezas y tablero
@@ -78,25 +75,28 @@ public:
    // Apartado Tema
    void loadSpritesheet(std::string path); // Pone las Piezas,Función color en futuro
 
+   // Apartado FEN
+
+   string getFen();//Carga Partida 
+   void loadFen();//Exporta partida
+
 private:
    // Estado del Juego Juegan blancas/negras, esperando al motor, validando movimiento, idle...
    State_t state;
 
-
    // Array de Piezas
    Piece *pieceSet[PIECESETSIZE];
-   void killPiece(Piece* p);//Elimina la pieza del array y la destruye
-   void setPiecesPos(); // Asigna posición a cada fichas
-   Piece *pieceAt(Pos_t pos);//devuelve la pieza en la posicíon
-   Pos_t tileSelect ={-1,-1} ;//Casilla seleccionada
-   bool isValidPieceMove(Piece* piece, Pos_t dest);
+   void killPiece(Piece *p);    // Elimina la pieza del array y la destruye
+   void setPiecesPos();         // Asigna posición a cada fichas
+   Piece *pieceAt(Pos_t pos);   // devuelve la pieza en la posicíon
+   Pos_t tileSelect = {-1, -1}; // Casilla seleccionada
+   bool isValidPieceMove(Piece *piece, Pos_t dest);
    Pos_t lookFor(Player_t color, Figure_t figure);
-   bool isKingBeingExposed(Piece* piece, Pos_t dest);//Función
+   bool isKingBeingExposed(Piece *piece, Pos_t dest); // Función
 
-   void disablePiece(Piece* piece);//Deshabilita una Pieza en el tablero para hacer checks
-   void enablePiece(Piece * piece);
+   void disablePiece(Piece *piece); // Deshabilita una Pieza en el tablero para hacer checks
+   void enablePiece(Piece *piece);
    bool kingCheck = false;
-
 
    //  Spritesheet Piezas
    SDL_Texture *spriteSheet;
@@ -112,8 +112,7 @@ private:
 
    Pos_t tileAt(int x, int y);
 
-
-   //Cambiador de estado
+   // Cambiador de estado
    void nextTurn();
 
    // Eventos de la ventana chessboard
