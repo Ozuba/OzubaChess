@@ -399,6 +399,7 @@ bool ChessBoard::isValidMove(Piece *piece, Pos_t dest)
             Pos_t back;
             Piece *disabled = pieceAt(dest);
             disablePiece(pieceAt(dest)); // Si la hay sino no hace na
+            
             back.a = piece->a;           // Hacemos backup de la posicion
             back.b = piece->b;
             piece->a = dest.a; // Movemos la pieza a la posicion destino
@@ -526,7 +527,7 @@ bool ChessBoard::isKingBeingExposed(Piece *piece, Pos_t dest)
     {
         if (pieceSet[i] != nullptr)
         { // Si la pieza existe
-            if (pieceSet[i]->color != piece->color && piece->figure != KING)
+            if (pieceSet[i]->color != piece->color)
             { // Si es del otro equipo
 
                 if (isValidMove(pieceSet[i], kingPos)) // Ojo la kingpos no esta bien y corregirla por el debugger tampoco ko arregla
