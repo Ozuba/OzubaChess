@@ -10,12 +10,13 @@ it currently supports the basic part of the Chess Ruleset:
           
 # To be implemented: #
 
- - [ ] Support for FEN notation loading of games and fen output
+ - [ ] Support for FEN notation loading of game
+ - [x] FEN output
  - [ ] Support for Game ending screen
  - [ ] Tie detection
  - [ ] Animations
  - [ ] Click Based piece movement
- - [ ] Hints of available moves on the board;
+ - [x] Hints of available moves on the board;
  - [ ] Add sounds
  - [ ] En Passant
  - [ ] Castling
