@@ -56,6 +56,35 @@ void ChessBoard::drawBoard() // Añadir el highlight en un futuro[matriz binaria
     // SDL_RenderPresent(renderer);
 }
 
+void ChessBoard::drawHints(Piece *piece) // Añadir el highlight en un futuro[matriz binaria o numero de 64bits]
+{
+    Pos_t pos;
+    SDL_Rect tile;
+    if (piece != nullptr)
+    {
+        for (int y = 0; y < CHESSHEIGHT; y++)
+        {
+            pos.b = y;
+            for (int x = 0; x < CHESSWIDTH; x++) // Por alguna razon no se incrementa en su propia fila
+            {
+                pos.a = x;
+                if (isValidMove(piece, pos))
+                {                                                                          // añadir check si no queremos pintar el propio sitio o pintarlo de otro colo
+                    if (!(pieceAt(pos) != nullptr && pieceAt(pos)->color == piece->color)) // Si la pieza es de nuestro equipo(Cosa aprendida c skipea el evaluado del segundo operando si el primero es falso)
+                    {
+                        tile.x = x * width / CHESSWIDTH;
+                        tile.y = (CHESSHEIGHT - y - 1) * height / CHESSHEIGHT; // Ojo el tablero se dibuja en orden de lectura arriba->derecha las pieza abajo->derecha
+                        tile.w = width / CHESSWIDTH;
+                        tile.h = height / CHESSHEIGHT;
+                        SDL_SetRenderDrawColor(renderer, 0, 255, 0, 125); // Color de hint
+                        SDL_RenderFillRect(renderer, &tile);
+                    }
+                }
+            }
+        }
+    }
+}
+
 void ChessBoard::loadSpritesheet(std::string path)
 {
     spriteSheet = loadTexture(path.c_str(), renderer);
@@ -102,6 +131,16 @@ void ChessBoard::renderPiece(Piece *_piece)
     SDL_RenderCopy(renderer, spriteSheet, &pieceClip, &renderQuad);
 }
 
+void ChessBoard::render() // Global renderer
+{
+    SDL_RenderClear(renderer); // Limpia pantalla
+    drawBoard();               // Dibuja Tablero
+    drawHints(selectedPiece);
+    drawPieces(); // Dibuja llas Piezas
+    SDL_RenderPresent(renderer);
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////[Piece draw functions]//////////////////////////////
 void ChessBoard::setPiecesPos()
 {
     for (int i = 0; i < PIECESETSIZE; i++)
@@ -150,13 +189,6 @@ void ChessBoard::drawPieces() ///////////Contruir de nuevo en base a lista de fi
             renderPiece(pieceSet[i]);
         }
     }
-}
-
-void ChessBoard::render()
-{
-    drawBoard();  // Dibuja Tablero
-    drawPieces(); // Dibuja llas Piezas
-    SDL_RenderPresent(renderer);
 }
 
 /////////////////////////////////////////////////////////////////////////////////[LOOP FUNCTION]//////////////////////////////////////////////////////////////////////
@@ -233,7 +265,7 @@ void ChessBoard::clickHandler()
     Pos_t destPos;
     SDL_GetMouseState(&mx, &my);
     tileSelect = tileAt(mx, my);
-    Piece *selectedPiece = pieceAt(tileSelect);
+    selectedPiece = pieceAt(tileSelect);
     // Por ahora implementaremos sin tiempo si se suelta el raton en la pieza donde se pulso queda seleccionada la pieza
     if (selectedPiece != nullptr) // Si hemos cogido una Pieza
     {
@@ -287,6 +319,7 @@ void ChessBoard::clickHandler()
             }
         }
     }
+    selectedPiece = nullptr; // Pase lo que pase al salir de la funcion la pieza no debe seleccionarse
 }
 ////////////////////////////////////////////////////////////////////[FUNCIONES DE JUEGO]//////////////////////////////////////////////////////////
 
@@ -399,8 +432,8 @@ bool ChessBoard::isValidMove(Piece *piece, Pos_t dest)
             Pos_t back;
             Piece *disabled = pieceAt(dest);
             disablePiece(pieceAt(dest)); // Si la hay sino no hace na
-            
-            back.a = piece->a;           // Hacemos backup de la posicion
+
+            back.a = piece->a; // Hacemos backup de la posicion
             back.b = piece->b;
             piece->a = dest.a; // Movemos la pieza a la posicion destino
             piece->b = dest.b;
@@ -660,9 +693,9 @@ string ChessBoard::getFen()
                 }
             }
         }
-        pos.a = 0; // recordemos que el bucle ya no se encarga de esto
-        if (emptycnt != 0)//Tambien se comprueba aqui por si no hay fichas
-        { // Contador distinto de 0
+        pos.a = 0;         // recordemos que el bucle ya no se encarga de esto
+        if (emptycnt != 0) // Tambien se comprueba aqui por si no hay fichas
+        {                  // Contador distinto de 0
             fen.append(to_string(emptycnt));
             emptycnt = 0; // resetea
         }

@@ -83,7 +83,7 @@ public:
 private:
    // Estado del Juego Juegan blancas/negras, esperando al motor, validando movimiento, idle...
    State_t state;
-
+   Piece* selectedPiece = nullptr;//Pieza seleccionada nullptr si no hay ninguna
    // Array de Piezas
    Piece *pieceSet[PIECESETSIZE];
    void killPiece(Piece *p);    // Elimina la pieza del array y la destruye
@@ -121,6 +121,7 @@ private:
    void clickHandler();
    // RENDER
    void drawBoard();                // Dibuja el tablero
+   void drawHints(Piece* piece = nullptr);                //Posible incluir en el drawBoard pero mejor por separado
    void drawPieces();               // Dibuja las pieazas en su lugar
    void renderPiece(Piece *_piece); // Toma Pieza y la renderiza con las dimensiones dadas por el tablero y su posición en el
 };
