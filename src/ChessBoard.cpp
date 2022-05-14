@@ -13,6 +13,10 @@ ChessBoard::ChessBoard(size_t h, size_t w)
     bsurface = SDL_GetWindowSurface(window);
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC); // Soporta texturas para las piezas
     SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
+    for (int i = 0; i < PIECESETSIZE; i++) // Inicializamos el array a nullptr
+    {
+        pieceSet[i] = nullptr;
+    }
 }
 
 ChessBoard::~ChessBoard()
@@ -703,4 +707,90 @@ string ChessBoard::getFen()
     }
 
     return fen;
+}
+
+void ChessBoard::loadFen(string fen)
+{
+    for (int i=0; i < PIECESETSIZE; i++) // Cleans game
+    {
+        delete pieceSet[i];
+        pieceSet[i] = nullptr;
+    }
+    int spc = 0; // Space counter
+    Figure_t fig;
+    Player_t player;
+    Pos_t pos; // destiny
+    for (int i = 0; i < fen.size(); i++)
+    {
+        if (std::isdigit(fen[i]))
+        {
+            spc = spc + (int)fen[i]-48; // Suma el numero de espacios truco magico de los numeros(48)
+        }
+        else
+        {
+            if (fen[i] != '/')
+            {
+
+                switch (fen[i])
+                {
+                case 'k':
+                    fig = KING;
+                    player = BLACK;
+                    break;
+                case 'K':
+                    fig = KING;
+                    player = WHITE;
+
+                    break;
+                case 'q':
+                    fig = QUEEN;
+                    player = BLACK;
+                    break;
+                case 'Q':
+                    fig = QUEEN;
+                    player = WHITE;
+                    break;
+                case 'b':
+                    fig = BISHOP;
+                    player = BLACK;
+                    break;
+                case 'B':
+                    fig = BISHOP;
+                    player = WHITE;
+                    break;
+                case 'n':
+                    fig = KNIGHT;
+                    player = BLACK;
+                    break;
+                case 'N':
+                    fig = KNIGHT;
+                    player = WHITE;
+                    break;
+                case 'r':
+                    fig = ROOK;
+                    player = BLACK;
+                    break;
+                case 'R':
+                    fig = ROOK;
+                    player = WHITE;
+                    break;
+                case 'p':
+                    fig = PAWN;
+                    player = BLACK;
+                    break;
+                case 'P':
+                    fig = PAWN;
+                    player = WHITE;
+                    break;
+                }
+                                                // el espacio de la pieza
+                pos.a = spc % CHESSWIDTH; // Formula de conteo
+                pos.b = floor(spc / CHESSHEIGHT);
+                spc++; 
+                Piece *p = new Piece(player, fig, pos.a, pos.b);
+                enablePiece(p);
+            }
+        }
+    }
+    setPiecesPos();//Actualiza la posicion de todas las piezas
 }

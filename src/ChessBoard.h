@@ -78,7 +78,7 @@ public:
    // Apartado FEN
 
    string getFen();//Carga Partida 
-   void loadFen();//Exporta partida
+   void loadFen(string fen);//Exporta partida
 
 private:
    // Estado del Juego Juegan blancas/negras, esperando al motor, validando movimiento, idle...
