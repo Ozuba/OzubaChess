@@ -330,28 +330,7 @@ void ChessBoard::clickHandler()
 void ChessBoard::newGame() // Positions pieces like classic game
 {
 
-    // Todo esto será borrado por la funcion loadFen() que simplificará cambiar el tablero
-
-    Figure_t startPieces[8] = {ROOK, KNIGHT, BISHOP, KING, QUEEN, BISHOP, KNIGHT, ROOK};
-    ////////WHITE///////////////////////////////////////
-    for (int i = 0; i < 8; i++)
-    {
-        pieceSet[i] = new Piece(WHITE, startPieces[i], i, 0);
-    }
-    for (int i = 8; i < 16; i++)
-    {
-        pieceSet[i] = new Piece(WHITE, PAWN, i - 8, 1);
-    }
-    /////////////BLACK///////////////////////////////////
-    for (int i = 16; i < 24; i++)
-    {
-        pieceSet[i] = new Piece(BLACK, startPieces[i - 16], i - 16, 7);
-    }
-    for (int i = 24; i < 32; i++)
-    {
-        pieceSet[i] = new Piece(BLACK, PAWN, i - 24, 6);
-    }
-    setPiecesPos();     // Actualiza las Piezas
+    loadFen("RNBQKBNR/PPPPPPPP/8/8/8/8/pppppppp/rnbqkbnr");
     state = WHITEPLAYS; // Juegan Blancas
 }
 
@@ -711,7 +690,7 @@ string ChessBoard::getFen()
 
 void ChessBoard::loadFen(string fen)
 {
-    for (int i=0; i < PIECESETSIZE; i++) // Cleans game
+    for (int i = 0; i < PIECESETSIZE; i++) // Cleans game
     {
         delete pieceSet[i];
         pieceSet[i] = nullptr;
@@ -724,7 +703,7 @@ void ChessBoard::loadFen(string fen)
     {
         if (std::isdigit(fen[i]))
         {
-            spc = spc + (int)fen[i]-48; // Suma el numero de espacios truco magico de los numeros(48)
+            spc = spc + (int)fen[i] - 48; // Suma el numero de espacios truco magico de los numeros(48)
         }
         else
         {
@@ -783,14 +762,14 @@ void ChessBoard::loadFen(string fen)
                     player = WHITE;
                     break;
                 }
-                                                // el espacio de la pieza
+                // el espacio de la pieza
                 pos.a = spc % CHESSWIDTH; // Formula de conteo
                 pos.b = floor(spc / CHESSHEIGHT);
-                spc++; 
+                spc++;
                 Piece *p = new Piece(player, fig, pos.a, pos.b);
                 enablePiece(p);
             }
         }
     }
-    setPiecesPos();//Actualiza la posicion de todas las piezas
+    setPiecesPos(); // Actualiza la posicion de todas las piezas
 }
