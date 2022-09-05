@@ -10,8 +10,8 @@ ChessBoard::ChessBoard(size_t h, size_t w)
     SDL_Init(SDL_INIT_VIDEO);
     IMG_Init(IMG_INIT_PNG);
     window = SDL_CreateWindow("ChessBoard", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, w, h, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
-    bsurface = SDL_GetWindowSurface(window);
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC); // Soporta texturas para las piezas
+    bsurface = SDL_GetWindowSurface(window);
     SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
     for (int i = 0; i < PIECESETSIZE; i++) // Inicializamos el array a nullptr
     {
