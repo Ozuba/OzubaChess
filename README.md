@@ -10,8 +10,9 @@ it currently supports the basic part of the Chess Ruleset:
           
 # To be implemented: #
 
- - [ ] Support for FEN notation loading of game
+ - [x] Support for FEN notation loading of game
  - [x] FEN output
+ - [ ] Support for board turning(Whites/Blacks,Up/Down)
  - [ ] Support for Game ending screen
  - [ ] Tie detection
  - [ ] Animations
