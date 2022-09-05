@@ -2,12 +2,16 @@
 
 int main(int argc,char** args){
 
-ChessBoard board1(400,400);
+ChessBoard board(400,400);
+board.loadSpritesheet("assest/Pieces.png");
+board.newGame();
 
+if(argc > 1){
 
-board1.loadSpritesheet("assest/Pieces.png");
-board1.newGame();
-while(board1.loop());
-cout << board1.getFen();
+board.loadFen(args[1]);
+} 
+
+while(board.loop());
+cout << board.getFen();
 
 }
