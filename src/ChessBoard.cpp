@@ -305,7 +305,34 @@ void ChessBoard::clickHandler()
                         else if (selectedPiece->color == pieceAt(destPos)->color) // Si hay una pieza  de su color devolverla a su sitio
                         {
                             // IMPLEMENTAR ENROQUE AQUI ES LA UNICA CONDICION QUE HACE ALGO AL SOLTAR UNA FICHA SOBRE OTRA
-                            setPiecesPos(); // Reinicia las posiciones
+                            // El enroque se implementa aqui pq es el unico movimiento que involucra 2 piezas y por tanto especial
+                            // Mejorar esta implementación bool rook(king,tower)
+                            if (selectedPiece->figure == ROOK && pieceAt(destPos)->figure == KING && pieceAt(destPos)->neverMoved == true && selectedPiece->neverMoved == true) // Enroque
+                            {
+                                Pos_t path;
+                                path.b = selectedPiece->b;
+                                Piece *king = pieceAt(destPos);
+                                for (int x = king->a; abs(x - king->a) < 2; (x < selectedPiece->a ? x++ : x--)) // Suerte entendiendo makina
+                                {
+                                    path.a = x; // Aumentamos la posición destino
+
+                                    if (isKingBeingExposed(king, path)) // Si hay algun paso no valido en el camino del rey a su posición aborta
+                                    {
+                                        setPiecesPos(); // Devuelve todo a su sitio
+                                        return;         // sale de la funcion.
+                                    }
+                                } // Sobrevivío a los checks  el enroque es posble
+
+                                (king->a < selectedPiece->a ? destPos.a += 1 : destPos.a -= 1);
+                                (king->a < selectedPiece->a ? king->a += 2 : king->a -= 2); //  Mueve el Rey a la izquierda posición de la torre la del rey -1
+                                king->neverMoved = false;//enroque realizado
+
+                                move(selectedPiece, destPos); // Mueve Torre y pasa de turno
+                            }
+                            else
+                            {
+                                setPiecesPos(); // Reinicia las posiciones y devuelve la ficha graficamente a su sitio
+                            }
                         }
 
                         else if (pieceAt(destPos)->color != selectedPiece->color)
