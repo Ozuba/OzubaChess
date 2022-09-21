@@ -12,6 +12,7 @@ it currently supports the basic part of the Chess Ruleset:
 
  - [x] Support for FEN notation loading of game
  - [x] FEN output
+ - [ ] Argument for ip socket based online play
  - [ ] Support for board turning(Whites/Blacks,Up/Down)
  - [ ] Support for Game ending screen
  - [ ] Tie detection
