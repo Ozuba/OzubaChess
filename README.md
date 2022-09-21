@@ -21,7 +21,7 @@ it currently supports the basic part of the Chess Ruleset:
  - [x] Hints of available moves on the board;
  - [ ] Add sounds
  - [ ] En Passant
- - [X] Castling
+ - [x] Castling
 
 ## To Test ##
 
