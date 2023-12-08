@@ -28,7 +28,7 @@ it currently supports the basic part of the Chess Ruleset:
 Installed required libs with your prefered package manager:
 ## For Debian Based Systems: ##
 ```bash
-sudo apt-get install libsdl2-dev libsdl2-image-1.2
+sudo apt-get install libsdl2-dev libsdl-image-dev
 ```
 Run:
 
